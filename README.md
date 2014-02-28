@@ -19,7 +19,7 @@ Instead of using pprint we could use coroutines within the prepare statement to 
 
 Why does it stop after prepare?  Because we called self.finish() which is checked before an HTTP method handler is executed.
 
-```json
+```
 [I 140228 08:59:59 web:1728] 200 GET / (127.0.0.1) 1001.66ms
 [I 140228 08:59:59 web:1728] 202 GET / (127.0.0.1) 0.36ms
 {'duration': 0.000338,
