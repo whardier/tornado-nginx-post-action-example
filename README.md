@@ -48,6 +48,49 @@ Why does it stop after prepare?  Because we called self.finish() which is checke
 
 ```
 
+Flushing to a database instead
+------------------------------
+
+Something along these lines in the BaseHandler would suffice for most things.
+
+```python
+class BaseHandler(tornado.web.RequestHandler):
+
+    #...
+
+    @tornado.gen.coroutine
+    def prepare(self):
+    
+        if self.request.headers.get('X-Post-Action'):
+            self.set_status(202)
+            self.finish()
+    
+            yield motor.Op(
+                self.motor_client.post_action.insert,
+                {
+                    '_id': self.oid,
+                    'start': self.start,
+                    'end': datetime.datetime.now(pytz.UTC),
+                    'duration': (datetime.datetime.now(pytz.UTC) - self.start).total_seconds(),
+                    'request': {
+                        'protocol': self.request.protocol,
+                        'uri': self.request.uri,
+                        'body': self.request.body,
+                        'full_url': self.request.full_url(),
+                        'args': self.path_args,
+                        'kwargs': self.path_kwargs,
+                        'headers': dict((key,value) for key, value in self.request.headers.iteritems() if not key.startswith('X-Response')),
+                    },
+                    'response': {
+                        'headers': dict((key.replace('X-Response-',''), value) for key, value in self.request.headers.iteritems() if key.startswith('X-Response')),
+                    },
+                    'kwargs': self.kwargs,
+                },
+                w = 0,
+            )
+```
+
+
 See
 ---
 
