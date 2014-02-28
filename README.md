@@ -15,6 +15,8 @@ Result
 
 Here we see the first request with the 1 second delay.  Nginx logs a lot of the request time which we then pass along to the post action which returns a 202 HTTP code.  Very handy code for logging purposes.
 
+Method handlers can set arbitrary headers which can then be proxied into the post action.  This example uses the 'Random-Junk' header to show that off.
+
 Instead of using pprint we could use coroutines within the prepare statement to asyncronously flush this data off to mongodb (via motor).
 
 Why does it stop after prepare?  Because we called self.finish() which is checked before an HTTP method handler is executed.
@@ -22,8 +24,8 @@ Why does it stop after prepare?  Because we called self.finish() which is checke
 ```
 [I 140228 08:59:59 web:1728] 200 GET / (127.0.0.1) 1001.66ms
 [I 140228 08:59:59 web:1728] 202 GET / (127.0.0.1) 0.36ms
-{'duration': 0.000338,
- 'end': datetime.datetime(2014, 2, 28, 17, 59, 59, 481580, tzinfo=<UTC>),
+{'duration': 0.000293,
+ 'end': datetime.datetime(2014, 2, 28, 18, 55, 10, 951125, tzinfo=<UTC>),
  'kwargs': {},
  'request': {'args': [],
              'body': '',
@@ -40,12 +42,12 @@ Why does it stop after prepare?  Because we called self.finish() which is checke
              'uri': '/'},
  'response': {'headers': {'Upstream-Addr': '127.0.0.1:8081',
                           'Upstream-Content-Type': 'application/json; charset=UTF-8',
+                          'Upstream-Random-Junk': 'gobbldegook',
                           'Upstream-Request-Time': '1.002',
                           'Upstream-Server': 'TornadoServer/3.2',
                           'Upstream-Status': '200',
                           'Upstream-Time': '1.002'}},
- 'start': datetime.datetime(2014, 2, 28, 17, 59, 59, 481251, tzinfo=<UTC>)}
-
+ 'start': datetime.datetime(2014, 2, 28, 18, 55, 10, 950841, tzinfo=<UTC>)}
 ```
 
 Flushing to a database instead
