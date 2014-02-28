@@ -72,6 +72,7 @@ class StubHandler(BaseHandler):
     @tornado.gen.engine
     def get(self, *args, **kwargs):
         self.write(dict(self.request.headers))
+        self.set_header('Random-Junk', 'gobbldegook')
         yield tornado.gen.Task(tornado.ioloop.IOLoop.instance().add_timeout, time.time() + 1)
         self.finish()
 
